@@ -1,0 +1,20 @@
+# indiquer a quelle categorie va suivre la configuration suivante 
+# https://exampleconfig.com/view/mariadb-ubuntu18-04-etc-mysql-mariadb-conf-d-50-server-cnf
+[mysqld]
+
+# la partie mysqld contient les instruction du daemon du serveur
+user = mysql
+
+pid-file = /run/mysqld/mysqld.pid
+
+# preciser ou MySQL peut trouver la socket pour communiqur
+socket = /run/mysqld/mysqld.sock
+
+# preciser a MySQL sur quel port communiquer
+port = 3306
+
+# preciser le dossier qui stockera notre base de donnees
+datadir = /var/lib/mysql
+
+# preciser que toutes les IP du reseau peuvent se connecter 
+bind-address = 0.0.0.0

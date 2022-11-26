@@ -1,0 +1,70 @@
+# Commemcer par la version de docker-compose
+version: '3.3'
+
+services:
+  mariadb:
+    image: mariadb
+    container_name: mariadb
+    networks:
+      - inception # a quel network il appartient
+    env_file: .env
+    volumes:
+      - mariadb:/var/lib/mysql
+    build:
+      context: requirements/mariadb # ou se trouve le dockerfile
+      dockerfile: Dockerfile # le nom du Dockerfile
+    expose:
+      - "3306" # le port a exposer
+    restart: always # unless-stopped # redemarre tant qu'il n'est pas stoppe
+
+  nginx:
+    image: nginx
+    container_name: nginx
+    networks:
+      - inception
+    env_file: .env
+    volumes:
+      - wordpress:/var/www/wordpress
+    depends_on: 
+      - wordpress # ne pas demarrer tant que wordpress n'a pas demarre
+    build:
+      context: requirements/nginx
+      dockerfile: Dockerfile
+    ports:
+      - "443:443"
+    restart: on-failure # le container redemarrera uniquement en cas de crash
+
+  wordpress:
+    image: wordpress
+    container_name: wordpress
+    networks:
+      - inception
+    env_file: .env
+    volumes:
+      - wordpress:/var/www/wordpress
+    depends_on:
+      - mariadb
+    build:
+      context: requirements/wordpress
+      dockerfile: Dockerfile
+    expose:
+      - "9000" 
+    restart: always
+
+volumes:
+  wordpress:
+    driver: local #nous stockons le volume en local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/home/cle-gran/data/wordpress1' # ou stocker le dossier sur l'ordinateur en local
+  mariadb:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/home/cle-gran/data/mariadb1'
+
+
+networks:
+  inception:
